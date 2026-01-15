@@ -5,5 +5,6 @@ const router = Router();
 
 router.get("/", noteController.findAll);
 router.put("/", noteController.upsert);
+router.delete("/:id", noteController.softDelete);
 
 export default router
