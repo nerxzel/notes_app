@@ -28,7 +28,7 @@ const upsertNote = async (data) => {
 }
 
 const softDeleteNote = async (id) => {
-    const deletedNote = await prisma.note.update({
+   try { const deletedNote = await prisma.note.update({
         where: {id: id},
         data: {
             deletedAt: new Date()
@@ -36,6 +36,13 @@ const softDeleteNote = async (id) => {
     });
 
     return deletedNote;
+}  catch {
+    if (error.code === 'P2025') {
+            return null;
+        }
+        throw error
+}
+
 }
 
 export default {

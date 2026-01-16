@@ -2,19 +2,32 @@ import { Card, Form, Button } from 'react-bootstrap';
 import { ulid } from 'ulid'
 import { useState, useEffect } from 'react';
 import localDb from '../services/localDb.js'
+import 'bootstrap/dist/css/bootstrap.min.css';
+import '../styles/index.css'
 
-function NoteForm({ onNoteSaved }) {
+function NoteForm({ onNoteSaved, editing, onCancel }) {
 
     const [title, setTitle] = useState("")
     const [content, setContent] = useState("")
+
+    useEffect(() => {
+        if (editing) {
+            setTitle(editing.title);
+            setContent(editing.content);
+        } else {
+            setTitle("");
+            setContent("");
+        }
+    }, [editing])
 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
         if (!title.trim()) return;
 
+        const noteId = editing ? editing.id : ulid();
         const newNote = {
-            id: ulid(),
+            id: noteId,
             title: title,
             content: content
         }
@@ -25,31 +38,29 @@ function NoteForm({ onNoteSaved }) {
             setTitle("")
             setContent("")
 
-            console.log("Note saved at localDb", newNote)
-
             if (onNoteSaved) {
                 onNoteSaved()
             };
         } catch (error) {
-            console.error("Error al guardar:", error)
+            console.error("Error saving:", error)
 
         }
     }
 
-    const handleEdit = async (e) => { }
-
-    const handleDelete = async (e) => { }
-
-
     return (
-        <Card className="mb-4">
+        <Card className={`mb-4 shadow ${editing ? "border-warning" : "border-primary"}`}>
+            <Card.Header className={editing ? "bg-warning bg-opacity-10" : "bg-primary bg-opacity-10"}>
+                <h5 className="card-title text-muted mb-3">
+                    {editing ? "Edit Note" : "New Note"}
+                </h5>
+            </Card.Header>
             <Card.Body>
                 <Form onSubmit={handleSubmit}>
                     <Form.Group className="mb-3">
                         <Form.Label>Title</Form.Label>
                         <Form.Control
                             type="text"
-                            placeholder="Ex: Buy bread..."
+                            placeholder="Ex: Grocery shopping..."
                             value={title}
                             onChange={(e) => setTitle(e.target.value)}
                         />
@@ -59,16 +70,19 @@ function NoteForm({ onNoteSaved }) {
                         <Form.Control
                             as="textarea"
                             rows={3}
-                            placeholder="Write the details..."
+                            placeholder="Add a description..."
                             value={content}
                             onChange={(e) => setContent(e.target.value)}
                         />
                     </Form.Group>
-
-                    <Button variant="success" type="submit">Save</Button>
-
-                    {/*<Button variant="primary">Edit</Button>
-                    <Button variant="danger">Delete</Button>*/}
+                    <div>
+                        <Button variant={editing ? "warning" : "success"} type="submit">{editing ? "Update" : "Save"}</Button>
+                        {editing && (<Button variant="secondary" onClick={() => {
+                            setTitle("");
+                            setContent("");
+                            onCancel();
+                        }}>Cancel</Button>)}
+                    </div>
                 </Form>
             </Card.Body>
         </Card>
