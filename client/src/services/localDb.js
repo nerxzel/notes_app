@@ -45,9 +45,9 @@ const softDeletedNote = async (id) => {
 
     const deletedNote = {
         ...note,
-        deletedAt: new Date().toISOString,
+        deletedAt: new Date().toISOString(),
         synced: false,
-        updatedAt: new Date().toISOString
+        updatedAt: new Date().toISOString()
     };
 
     await db.put(STORE_NAME, deletedNote);
@@ -75,10 +75,33 @@ const getUnsyncedNotes = async () => {
     return filteredNotes;
 }
 
+const mergeNote = async (serverNote) => {
+    const db = await getDB();
+    const localNote = await db.get(STORE_NAME, serverNote.id);
+
+ 
+    if (!localNote) {
+        
+        if (serverNote.deletedAt) return;
+        
+        await db.put(STORE_NAME, { ...serverNote, synced: true });
+        return;
+    }
+
+    const serverTime = new Date(serverNote.updatedAt).getTime();
+    const localTime = new Date(localNote.updatedAt).getTime();
+
+    if (serverTime > localTime) {
+        
+        await db.put(STORE_NAME, { ...serverNote, synced: true });
+    } 
+}
+
 export default {
     getAllNotes,
     createNote,
     softDeletedNote,
     markNoteAsSynced,
-    getUnsyncedNotes
+    getUnsyncedNotes,
+    mergeNote
 }
