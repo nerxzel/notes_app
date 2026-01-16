@@ -6,6 +6,8 @@ const noteSchema = z.object({
     id: z.string().regex(ULID_REGEX, { message: "Invalid UUID"}),
     title: z.string().min(1, {message: "Title cannot be empty"}),
     content: z.string().optional(),
+    updatedAt: z.coerce.date().optional(), 
+    createdAt: z.coerce.date().optional()
 })
 
 export default noteSchema;

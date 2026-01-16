@@ -45,9 +45,9 @@ const softDeletedNote = async (id) => {
 
     const deletedNote = {
         ...note,
-        deletedAt: new Date().toISOString,
+        deletedAt: new Date().toISOString(),
         synced: false,
-        updatedAt: new Date().toISOString
+        updatedAt: new Date().toISOString()
     };
 
     await db.put(STORE_NAME, deletedNote);
