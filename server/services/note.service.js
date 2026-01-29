@@ -1,9 +1,7 @@
 import prisma from "../config/prisma.js";
 
 const getAllNotes = async () => {
-    const notes = await prisma.note.findMany({
-        where: { deletedAt: null }
-    });
+    const notes = await prisma.note.findMany();
     return notes;
 }
 

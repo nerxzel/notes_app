@@ -81,7 +81,8 @@ const mergeNote = async (serverNote) => {
 
  
     if (!localNote) {
-        
+
+        console.log("revisar aquí:" + serverNote.deletedAt)
         if (serverNote.deletedAt) return;
         
         await db.put(STORE_NAME, { ...serverNote, synced: true });
